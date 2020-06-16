@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Student Care</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+		{% block stylesheet%}
+		{% endblock %}
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    </head>
+    <body>
+    	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		 	<a class="navbar-brand" href="{{ url_for('index') }}">
+		  		Student Care
+			</a>
+		  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+		    <span class="navbar-toggler-icon"></span>
+		  </button>
+		  <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+		    
+		    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+		      {% block navbar_list %}
+			  {% endblock %}
+		      
+		    </ul>
+		    <form class="form-inline my-2 my-lg-0">
+		      <input class="form-control mr-sm-2" type="search" list="pages" placeholder="Search" aria-label="Search">
+		      <datalist id = "pages">
+		      	
+		      </datalist>
+		      <button class="btn btn-success" type="submit">Search</button>
+		    </form>
+		  </div>
+		</nav>
+		{% block body%}
+		{% endblock %}
+    </body>
+</html>

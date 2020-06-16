@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block stylesheet %}
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='chat.css') }}">
+{% endblock %}
+
+{% block navbar_list %}
+
+  <li class="nav-item active ">
+	<a class="nav-link" href="{{ url_for('chat') }}">Chat</a>
+  </li>
+  <li class="nav-item">
+	<a class="nav-link" href="{{ url_for('calendar') }}">Calendar</a>
+  </li>
+  <li class="nav-item">
+	<a class="nav-link" href="{{ url_for('school_site') }}">School Site</a>
+  </li>
+
+{% endblock %}
+
+{% block body%}
+	Chat
+	<div class="container">
+		
+		<div class="row">
+			<div class="col-md-3 left">
+				bsby
+			</div>
+			<div class="col-md-9 right">
+				darling
+			</div>
+		</div>
+	</div>
+{% endblock %}
