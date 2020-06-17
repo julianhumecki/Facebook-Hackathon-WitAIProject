@@ -18,16 +18,97 @@
 {% endblock %}
 
 {% block body%}
-	Chat
-	<div class="container">
+
+<div class="container">
+<h3 class=" text-center">Messaging</h3>
+<div class="messaging">
+      <div class="inbox_msg">
+        <div class="inbox_people">
+          <div class="headind_srch">
+            <div class="recent_heading">
+              <h4>Messages</h4>
+            </div>
+            <div class="srch_bar">
+              <div class="stylish-input-group">
+                <input type="text" class="search-bar"  placeholder="Search" >
+                <span class="input-group-addon">
+                <button type="button"> <i class="fa fa-search" aria-hidden="true"></i> </button>
+                </span> </div>
+            </div>
+          </div>
+          <div class="inbox_chat">
+			  
+            <div class="chat_list active_chat">
+              <div class="chat_people">
+                <div class="chat_img"> <img src="https://i.redd.it/6drhbjvpvvz41.jpg" alt="sunil"> </div>
+                <div class="chat_ib">
+                  <h5>Selena Gomez is WitAI 
+					  <span class="chat_date">
+					  	{% if not messageHistory.peek() == None %}
+						  {{ messageHistory.peek().dayTime[1] }}
+						{% endif %}
+					  </span>
+				  </h5>
+					<!-- last message 	 -->
+                  <p> {% if not messageHistory.peek() == None %}
+						  {{ messageHistory.peek().messagePair[1] }}
+						{% endif %} 
+				  </p>
+                </div>
+              </div>
+            </div>
+            
+
+          </div>
+        </div>
+        <div class="mesgs">
+          <div class="msg_history">
+			  {% for message in messageHistory.stack %}
+			  
+			  	{% if message.messagePair[0] == witName %}
+			  		<div class="incoming_msg">
+              			<div class="incoming_msg_img"> <img src="https://i.redd.it/6drhbjvpvvz41.jpg" alt="sunil">
+						</div>
+						<div class="received_msg">
+							<div class="received_withd_msg">
+							  <p> {{ message.messagePair[1] }} </p>
+							  <span class="time_date"> {{ message.dayTime[0] }}    |    {{ message.dayTime[1] }} </span>
+							</div>
+						</div>
+            		</div>
+			    {% else %}
+			  		<div class="outgoing_msg">
+					  <div class="sent_msg">
+						<p> {{ message.messagePair[1] }}</p>
+						<span class="time_date"> {{ message.dayTime[0] }}    |    {{ message.dayTime[1] }} </span> 
+					  </div>
+            		</div>
+			  {% endif %}
+			{% endfor %}
+
+          </div>
+          <div class="type_msg">
+            <div class="input_msg_write">
+				<!-- Submit form to chat  -->
+				<form action="{{ url_for('chat') }}" method="post">
+					<!-- the label_def="label_value" is name="name" -->
+					<textarea class="write_msg" name="user-message" placeholder="Type a message..."></textarea>
+					<!-- <div class="pull-right">
+						<button class="btn btn-primary" type="button"> Send </button>	  
+					</div> -->
+					<button>Send</button>
+				</form>
+              
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      
+      
+    </div>
 		
-		<div class="row">
-			<div class="col-md-3 left">
-				bsby
-			</div>
-			<div class="col-md-9 right">
-				darling
-			</div>
-		</div>
 	</div>
+
 {% endblock %}
