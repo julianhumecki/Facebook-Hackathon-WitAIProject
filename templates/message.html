@@ -18,5 +18,43 @@
 {% endblock %}
 
 {% block body%}
-	Home
+		<div class="container">
+			<h2 class="text-center"> 
+				Add a Task to Calendar 
+			</h2>
+			<div class="main">
+				<div class="main-center">
+				
+					<form action="{{ url_for('index') }}" method="post">
+						
+
+						<div class="form-group">
+							<label for="task-name">Task Name</label>
+								<div class="input-group">
+									<input type="text" class="form-control" name="task-name" placeholder="Name of Task..."/>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label for="dueDate">Due Date</label>
+								<div class="input-group">
+							
+									<input type="date" class="form-control" name="dueDate" placeholder=""/>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label for="quick-describe">Brief Description</label>
+								<div class="input-group">
+									<input type="text" class="form-control" name="quick-describe" placeholder="I need to do this...."/>
+								</div>
+						</div>
+
+
+				<button type="submit">SUBMIT</button>
+						
+					</form>
+				</div><!--main-center"-->
+			</div><!--main-->
+		</div><!--container-->
 {% endblock %}

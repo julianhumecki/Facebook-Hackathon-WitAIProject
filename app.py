@@ -1,9 +1,10 @@
 from flask import Flask, render_template, request, session
-from Stack import Stack
-from MessageHistory import MessagePair, numericMonthToName
+from Stack import Stack, TaskList
+from MessageHistory import MessagePair, numericMonthToName, Task
 from datetime import datetime
 from pytz import timezone
 from Service.WitConnector import *
+
 
 app = Flask(__name__)
 app.debug = True
@@ -13,13 +14,23 @@ tz = timezone('Canada/Eastern')
 #connect to wit service
 wc = init_wit()
 
-@app.route("/")
+allTasks = TaskList()
+@app.route("/", methods=["GET", "POST"])
 def index():
+    if request.method == "POST":
+    #deal with new task
+        taskName = request.form.get("task-name") 
+        dueDate = request.form.get("dueDate")
+        description = request.form.get("quick-describe")
+        #add to our list of tasks
+        allTasks.addToList(Task(taskName, description, dueDate))
+        #print(len(allTasks.taskList))
     return render_template("message.html")
 
 
 #create a stack to store messages
 messageHistory = Stack()
+
 
 userName = "Name" 
 witName = "WitAI"
@@ -31,9 +42,9 @@ def chat():
     day = numericMonthToName[currentDayAndTime.month] + " " + str(currentDayAndTime.day)
     dayTime = (time, day)
     if request.method == "POST":
+        #deal with messages
         #get user query(message)
         userQuery = request.form.get("user-message")
-        
         messageHistory.push(MessagePair(userName, userQuery, dayTime))
         
         #get computer query
@@ -45,9 +56,13 @@ def chat():
         except:
             pass
 
-        phrase = 'I am not sure what\'s going on ' + answer[1]
+        #phrase = 'I am not sure what\'s going on ' + answer[1]
 
-        messageHistory.push(MessagePair(witName, phrase, dayTime))
+        #messageHistory.push(MessagePair(witName, phrase, dayTime))
+        witResponse = getWitResponse()
+        messageHistory.push(MessagePair(witName, witResponse, dayTime))
+        #------------------------------------------------------------------
+        
         
     return render_template("chat.html", messageHistory=messageHistory, witName=witName, userName=userName)
 
@@ -68,4 +83,3 @@ def extract(json):
     return [role, day]
 
 
-    

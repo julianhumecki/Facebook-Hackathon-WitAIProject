@@ -16,3 +16,11 @@ class Stack:
     def peek(self):
         if self.isEmpty(): return None
         return self.stack[-1]
+
+class TaskList:
+    def __init__(self):
+        self.taskList = list() 
+    def addToList(self, task):
+        self.taskList.append(task)      
+    def remove(self, task):
+        self.taskList.remove(task)  
