@@ -59,7 +59,7 @@ def chat():
         #phrase = 'I am not sure what\'s going on ' + answer[1]
 
         #messageHistory.push(MessagePair(witName, phrase, dayTime))
-        witResponse = getWitResponse()
+        #witResponse = getWitResponse()
         messageHistory.push(MessagePair(witName, witResponse, dayTime))
         #------------------------------------------------------------------
         
