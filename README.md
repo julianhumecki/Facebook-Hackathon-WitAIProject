@@ -10,8 +10,17 @@ A bot for helping students manage their workload and relieve their stress.
 
 <b><h2>Utterances</h2></b>
 
-Each utterance is related to an <i>entity</i> that consists of a <i>role</i>. 
-There is currently only one entity which is 'show_schedule' and it has only one role associated with it; 'day'. The 'day' role consists of the following values: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday, today, tomorrow, and tonight
+Each utterance is related to an <i>intent</i>. An intent is realated to an <i>entity</i> that consists of a <i>role</i>. 
+There are currently two intents; 'feeling' and 'show_schedule'.  
+
+show_shcedule has the 'day' intent
+
+'day' has only one role associated with it; 'day'. The 'day' role consists of the following values: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday, today, tomorrow, and tonight.
+
+feeling has the 'state' intent
+
+'state' consists of multiple roles including 'negative', 'very_negative', 'positive', 'very_positive' and 'neutral'. Additionally, each of these roles can have a value assocaited to it; for ex stressed_out, happy, excited, anxious, etc.
+
 
 The wit client's message() function returns a JSON object as follows. 
 
@@ -84,11 +93,134 @@ The wit client's message() function returns a JSON object as follows.
 }
 
 ```
+```
+# Example 3. Sentiments and feelings
+
+{
+   "text":"I am feeling stressed out",
+   "intents":[
+      {
+         "id":"4331082736909559",
+         "name":"feeling",
+         "confidence":0.9991
+      }
+   ],
+   "entities":{
+      "state:negative":[
+         {
+            "id":"2653812744877976",
+            "name":"state",
+            "role":"negative",
+            "start":13,
+            "end":25,
+            "body":"stressed out",
+            "confidence":0.9454,
+            "entities":[
+
+            ],
+            "value":"stressed out",
+            "type":"value"
+         }
+      ]
+   },
+   "traits":{
+      "wit$sentiment":[
+         {
+            "id":"5ac2b50a-44e4-466e-9d49-bad6bd40092c",
+            "value":"negative",
+            "confidence":0.6804
+         }
+      ]
+   }
+}
+
+
+```
+```
+# Ex. 4
+
+{
+   "text":"I am feeling down",
+   "intents":[
+      {
+         "id":"4331082736909559",
+         "name":"feeling",
+         "confidence":0.9978
+      }
+   ],
+   "entities":{
+      "state:negative":[
+         {
+            "id":"2653812744877976",
+            "name":"state",
+            "role":"negative",
+            "start":13,
+            "end":17,
+            "body":"down",
+            "confidence":0.9321,
+            "entities":[
+
+            ],
+            "value":"down",
+            "type":"value"
+         }
+      ]
+   },
+   "traits":{
+
+   }
+}
+
+```
+
+```
+Ex 5. 
+
+{
+   "text":"I am feeling excited",
+   "intents":[
+      {
+         "id":"4331082736909559",
+         "name":"feeling",
+         "confidence":0.9995
+      }
+   ],
+   "entities":{
+      "state:very_positive":[
+         {
+            "id":"209556380088589",
+            "name":"state",
+            "role":"very_positive",
+            "start":13,
+            "end":20,
+            "body":"excited",
+            "confidence":0.8613,
+            "entities":[
+
+            ],
+            "value":"excited",
+            "type":"value"
+         }
+      ]
+   },
+   "traits":{ 
+      "wit$sentiment":[
+         {
+            "id":"5ac2b50a-44e4-466e-9d49-bad6bd40092c",
+            "value":"positive",
+            "confidence":0.9673
+         }
+      ]
+   }
+}
+
+```
 
 <b>Sample Utterances</b>
 
 ```
-How goes Tuesday? 
+# Scheduled inquiries
+How goes Tuesday?
 What's on for Tuesday?
 What's the schedule fot Friday?
 How goes tomorrow?
@@ -103,8 +235,8 @@ How does thursday look like?
 What's on Wednesday?
 What is on for tomorrow?
 What's on for tomorrow?
+Today is the worst day of my life
 What's the plan for tomorrow?
-What's going on tomorrow?
 How does Thursday look like?
 What's the schedule for Monday?
 How does tomorrow look like?
@@ -116,4 +248,17 @@ What's on tonight?
 What's up for tomorrow?
 What's up today?
 How goes Monday
+
+# Emotional state
+I am on top of the world
+I am very happy today
+What's going on tomorrow?
+i am feeling stressed out
+I feel like garbage
+I am feeling down
+I am super excited today
+I am so anxious
+I am feeling happy
+I feel fine
+I am kinda bored
 ```

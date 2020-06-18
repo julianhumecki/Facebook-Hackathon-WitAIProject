@@ -13,3 +13,6 @@ def init_wit():
     wc.logger.setLevel(logging.WARNING)
     return wc
 
+# experiment
+# r = init_wit()
+# print(r.message('I am feeling excited'))
