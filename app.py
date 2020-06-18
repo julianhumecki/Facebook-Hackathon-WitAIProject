@@ -3,11 +3,15 @@ from Stack import Stack
 from MessageHistory import MessagePair, numericMonthToName
 from datetime import datetime
 from pytz import timezone
-
+from Service.WitConnector import *
 
 app = Flask(__name__)
+app.debug = True
 
 tz = timezone('Canada/Eastern')
+
+#connect to wit service
+wc = init_wit()
 
 @app.route("/")
 def index():
@@ -33,8 +37,17 @@ def chat():
         messageHistory.push(MessagePair(userName, userQuery, dayTime))
         
         #get computer query
-        witResponse = "hello"
-        messageHistory.push(MessagePair(witName, witResponse, dayTime))
+        witResponse = wc.message(userQuery)
+        answer = ['', 'stupid']
+
+        try: 
+            answer = extract(witResponse)        
+        except:
+            pass
+
+        phrase = 'I am not sure what\'s going on ' + answer[1]
+
+        messageHistory.push(MessagePair(witName, phrase, dayTime))
         
     return render_template("chat.html", messageHistory=messageHistory, witName=witName, userName=userName)
 
@@ -47,3 +60,12 @@ def calendar():
 def school_site():
     return render_template("schoolSite.html")
 
+def extract(json):
+
+    ent = json['entities']   
+    role = ent['day:day'][0]['role']
+    day =  ent['day:day'][0]['value']
+    return [role, day]
+
+
+    
