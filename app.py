@@ -22,8 +22,15 @@ def index():
         taskName = request.form.get("task-name") 
         dueDate = request.form.get("dueDate")
         description = request.form.get("quick-describe")
+        timeDue = request.form.get("timeDue") 
+        location = request.form.get("location")
+        print(timeDue)
+        dueDateList = str(dueDate).split("-")
+        dueDate = (numericMonthToName[int(dueDateList[1])], int(dueDateList[2]))
+        print(dueDate)
+        input("Heyyy ")
         #add to our list of tasks
-        allTasks.addToList(Task(taskName, description, dueDate))
+        allTasks.addToList(Task(taskName, description, timeDue, location, dueDate))
         #print(len(allTasks.taskList))
     return render_template("message.html")
 
@@ -69,7 +76,8 @@ def chat():
     
 @app.route("/calendar")
 def calendar():
-    return render_template("calendar.html")
+
+    return render_template("calendar.html", allTasks=allTasks)
 
 @app.route("/schoolsite")
 def school_site():

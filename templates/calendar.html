@@ -17,6 +17,67 @@
 
 {% endblock %}
 
+
 {% block body%}
-	Calendar
+
+  
+<!------ Include the above in your HEAD tag ---------->
+
+<!-- Container, Row, and Column used for illustration purposes -->
+<div class="container">
+
+      
+            <!-- Fluid width widget -->        
+          <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <span class="glyphicon glyphicon-calendar"></span> 
+                        Your Calendar Events
+                    </h3>
+                </div>
+                <div class="panel-body">
+
+                    <ul class="media-list">
+                      {% for task in allTasks.taskList %}
+                        <li class="media">
+                            <div class="media-left">
+                                <div class="panel panel-primary text-center date">
+                                    <div class="panel-heading month">
+                                        <span class="panel-title strong hide-overflow">
+                                            <!-- month -->
+                                            {{ task.dueDate[0] }}
+                                        </span>
+                                    </div>
+                                    <div class="panel-body day text-danger hide-overflow">
+                                        {{ task.dueDate[1] }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="media-body">
+                                <h4 class="media-heading">
+                                   <strong> {{task.taskName }}</strong>
+                                   @
+                                   <strong> {{task.timeDue }} </strong>
+                                   in 
+                                   <strong> {{ task.location }}</strong>
+                                </h4>
+                                
+                                <p>
+                                    {{task.description}}
+                                </p>
+                            </div>
+                        </li>
+                      {% endfor %}
+                        
+                    </ul>
+                    <a href="#" class="btn btn-default btn-block">More Events »</a>
+                </div>
+            </div>
+            <!-- End fluid width widget --> 
+    
+            
+  
+</div>
+  
+
 {% endblock %}

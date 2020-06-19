@@ -6,10 +6,13 @@ class MessagePair:
         self.dayTime = dayAndTime
 #used for tasks
 class Task:
-    def __init__(self, taskName, description, dueDate):
+    def __init__(self, taskName, description, timeDue, location, dueDate):
         self.taskName = taskName
         self.description = description 
+        self.timeDue = timeDue
+        self.location = location
         self.dueDate = dueDate
+
     def updateFields(self, taskName=None, description=None, dueDate=None):
         if not taskName == None:
             self.taskName = taskName
