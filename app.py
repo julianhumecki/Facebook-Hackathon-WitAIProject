@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, redirect
 from Stack import Stack, TaskList
 from MessageHistory import MessagePair, numericMonthToName, Task
 from datetime import datetime
@@ -27,8 +27,7 @@ def index():
         print(timeDue)
         dueDateList = str(dueDate).split("-")
         dueDate = (numericMonthToName[int(dueDateList[1])], int(dueDateList[2]))
-        print(dueDate)
-        input("Heyyy ")
+        print(dueDate)       
         #add to our list of tasks
         allTasks.addToList(Task(taskName, description, timeDue, location, dueDate))
         #print(len(allTasks.taskList))
@@ -91,7 +90,50 @@ def extract(json):
     return [role, day]
 
 
-<<<<<<< HEAD
-=======
+#MS Login Step one
+CLIENT_ID = '09b9898f-33aa-49a3-b789-ba7ff8dbab04'
+SECRET_ID = '2ojw2Oa846EL~1itH~_26qv.k2GZ5-~N.q'
+credentials = (CLIENT_ID, SECRET_ID)
+
+
+from O365 import Account, MSGraphProtocol, calendar
+from calendar import Calendar
+import datetime as dt
+
+selfstate = None
+account = None
+
+CLIENT_ID = '09b9898f-33aa-49a3-b789-ba7ff8dbab04'
+SECRET_ID = '2ojw2Oa846EL~1itH~_26qv.k2GZ5-~N.q'
+credentials = (CLIENT_ID, SECRET_ID)
+
+
+
+@app.route('/mscal')
+def ms_login():
+
+    protocol = MSGraphProtocol() 
+    scopes = ['Calendars.Read.Shared']
+    account = Account(credentials, protocol=protocol)
+
+    if account.authenticate(scopes=['Calendars.Read', 'Calendars.Read.Shared', 'Calendars.ReadWrite', 'Calendars.ReadWrite.Shared', 'User.Read']):
+        print('Authenticated!')
+    else:
+        account = Account(credentials, protocol=protocol)
+        return 'error'
+
+    schedule = account.schedule()
+
+    calendar = schedule.get_calendar(calendar_name='Calendar')
+
+    q = calendar.new_query('start').greater_equal(dt.datetime(2018, 5, 20))
+    q.chain('and').on_attribute('end').less_equal(dt.datetime(2021, 5, 24))
+
+    birthdays = calendar.get_events(query=q, include_recurring=True)  # include_recurring=True will include repeated events on the result set.
+
+    for x in birthdays:
+        return str(x)
+
+
+
 app.run(port=9090) 
->>>>>>> 356bda1... commites
