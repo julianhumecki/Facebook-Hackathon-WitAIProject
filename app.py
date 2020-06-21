@@ -1,12 +1,21 @@
+
+#More stuff
 from flask import Flask, render_template, request, session, redirect
+from flask_session import Session
 from Stack import Stack, TaskList
 from MessageHistory import MessagePair, numericMonthToName, Task
 from datetime import datetime
 from pytz import timezone
+
+#wit 
 from Service.WitConnector import *
+#outlook
+from Service.MSGraphService import *
 
 
 app = Flask(__name__)
+app.secret_key = 'super secret key'
+app.config['SESSION_TYPE'] = 'filesystem'
 app.debug = True
 
 tz = timezone('Canada/Eastern')
@@ -33,13 +42,11 @@ def index():
         #print(len(allTasks.taskList))
     return render_template("message.html")
 
-
 #create a stack to store messages
 messageHistory = Stack()
-
-
 userName = "Name" 
 witName = "WitAI"
+
 @app.route("/chat", methods=["GET", "POST"])
 def chat():
     currentDayAndTime = datetime.now(tz)
@@ -71,7 +78,6 @@ def chat():
         
         
     return render_template("chat.html", messageHistory=messageHistory, witName=witName, userName=userName)
-
     
 @app.route("/calendar")
 def calendar():
@@ -89,51 +95,37 @@ def extract(json):
     day =  ent['day:day'][0]['value']
     return [role, day]
 
-
-#MS Login Step one
-CLIENT_ID = '09b9898f-33aa-49a3-b789-ba7ff8dbab04'
-SECRET_ID = '2ojw2Oa846EL~1itH~_26qv.k2GZ5-~N.q'
-credentials = (CLIENT_ID, SECRET_ID)
-
-
-from O365 import Account, MSGraphProtocol, calendar
-from calendar import Calendar
-import datetime as dt
-
-selfstate = None
-account = None
-
-CLIENT_ID = '09b9898f-33aa-49a3-b789-ba7ff8dbab04'
-SECRET_ID = '2ojw2Oa846EL~1itH~_26qv.k2GZ5-~N.q'
-credentials = (CLIENT_ID, SECRET_ID)
-
-
-
 @app.route('/mscal')
-def ms_login():
+def calendar_show():
+    return render_template("json.html")
 
-    protocol = MSGraphProtocol() 
-    scopes = ['Calendars.Read.Shared']
-    account = Account(credentials, protocol=protocol)
-
-    if account.authenticate(scopes=['Calendars.Read', 'Calendars.Read.Shared', 'Calendars.ReadWrite', 'Calendars.ReadWrite.Shared', 'User.Read']):
-        print('Authenticated!')
-    else:
-        account = Account(credentials, protocol=protocol)
-        return 'error'
-
-    schedule = account.schedule()
-
+#show calendar events
+@app.route('/caldata')
+def data():    
+    
+    account = get_account()
+    schedule = account.schedule()    
     calendar = schedule.get_calendar(calendar_name='Calendar')
+    q = calendar.new_query('start').greater_equal(dt.datetime(2019, 5, 20))
+    q.chain('and').on_attribute('end').less_equal(dt.datetime(2023, 5, 24))
+    events = calendar.get_events(query=q, include_recurring=True)  # include_recurring=True will include repeated events on the result set.    
 
-    q = calendar.new_query('start').greater_equal(dt.datetime(2018, 5, 20))
-    q.chain('and').on_attribute('end').less_equal(dt.datetime(2021, 5, 24))
+    return render_template('events.html', events=events)
 
-    birthdays = calendar.get_events(query=q, include_recurring=True)  # include_recurring=True will include repeated events on the result set.
+#authentication part1
+@app.route('/stepone')
+def auth_step_one():    
+    return redirect(auth_init())
 
-    for x in birthdays:
-        return str(x)
+#authentication part2
+@app.route('/steptwo')
+def auth_step_two_callback():       
+
+   if auth_end(request.url, request.args.get('state')):
+    return redirect('/caldata')
+   else:
+    return render_template('message.html')
 
 
+app.run(port=9090, ssl_context=('cert.pem', 'key.pem')) 
 
-app.run(port=9090) 
