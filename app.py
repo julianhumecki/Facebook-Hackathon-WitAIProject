@@ -8,6 +8,7 @@ from MessageHistory import MessagePair, numericMonthToName, Task
 from datetime import datetime
 from pytz import timezone
 from Service.WitConnector import *
+from Scraping.scraping import *
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -93,7 +94,15 @@ def chat():
         year = currentDayAndTime.year
         sender = "User"
 
-
+        witResponse = getSearchResults(userQuery)
+        #print(witResponse)
+        witRepo = str()
+        #for url in witResponse:
+        #    witRepo += url + "\n"
+        witResponse = witResponse[0]
+        #print(witResponse)
+        
+        
         #insert into the database
         userAdded = db.execute("INSERT INTO messagings (day, month, year, timesent, messagecontent, sender) VALUES (:day, :month, :year, :timesent, :messagecontent, :sender)",
                 {"day":day, "month": month, "year":year, "timesent":time, "messagecontent":userQuery, "sender":sender})
@@ -105,6 +114,7 @@ def chat():
         length = 0
         if not messagesLinkingToTable is None:
             length = len(messagesLinkingToTable)
+
 
         #messages = db.execute("SELECT messagehistory FROM users WHERE email = :email", {"email":session["username"]}).fetchone();
         #update entries in message history
@@ -120,7 +130,7 @@ def chat():
 
        
         fillMessageHistory()
-
+        
         
     return render_template("chat.html", messageHistory=session["messaginghistory"], witName=witName, userName=userName, signed_in=session["username"], navbar=session["welcome_message"])
 
