@@ -5,15 +5,30 @@
 
 {% block navbar_list %}
 
-  <li class="nav-item">
-	<a class="nav-link" href="{{ url_for('chat') }}">Chat</a>
-  </li>
-  <li class="nav-item">
-	<a class="nav-link" href="{{ url_for('calendar') }}">Calendar</a>
-  </li>
-  <li class="nav-item active">
-	<a class="nav-link" href="{{ url_for('school_site') }}">School Site</a>
-  </li>
+  {% if not signed_in == None %}
+    <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('chat') }}">Chat</a>
+    </li>
+    <li class="nav-item ">
+    <a class="nav-link" href="{{ url_for('calendar') }}">Calendar</a>
+    </li>
+    <li class="nav-item active">
+    <a class="nav-link" href="{{ url_for('school_site') }}">School Site</a>
+    </li>
+    <li class="nav-item loggedin">
+      <a class="nav-link" href="#"> {{ navbar }} </a>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+    </li>
+  {% else %}
+    <li class="nav-item active pull-right float-right">
+      <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+    </li>
+    <li class="nav-item pull-right float-right">
+      <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+    </li>
+  {% endif %}
 
 {% endblock %}
 

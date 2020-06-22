@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+{% block stylesheet %}
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='forms.css') }}">
+{% endblock%}
+
+{% block navbar_list %}
+
+	{% if not signed_in == None %}
+	  <li class="nav-item">
+		<a class="nav-link" href="{{ url_for('chat') }}">Chat</a>
+	  </li>
+	  <li class="nav-item ">
+		<a class="nav-link" href="{{ url_for('calendar') }}">Calendar</a>
+	  </li>
+	  <li class="nav-item">
+		<a class="nav-link" href="{{ url_for('school_site') }}">School Site</a>
+	  </li>
+	  <li class="nav-item loggedin">
+	  	<a class="nav-link" href="#"> {{ navbar }} </a>
+	  </li>
+	  <li class="nav-item">
+		<a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+	  </li>
+	{% else %}
+	  <li class="nav-item active pull-right float-right">
+	    <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+	  </li>
+	  <li class="nav-item pull-right float-right">
+	    <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+	  </li>
+	{% endif %}
+
+{% endblock %}
+
+
+{% block body%}
+	<div class="cotainer">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header text-center">Login: <span style="color:red;">{{error}}</span></div>
+                    <div class="card-body">
+                        <form action="{{ url_for('login') }}" method="post">
+                            <div class="form-group row">
+                                <label for="username" class="col-md-4 col-form-label text-md-right">E-Mail Address</label>
+                                <div class="col-md-6">
+                                    <input type="text" id="email_address" class="form-control" name="username" required autofocus>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="password" class="col-md-4 col-form-label text-md-right">Password</label>
+                                <div class="col-md-6">
+                                    <input type="password" id="password" class="form-control" name="password" required>
+                                </div>
+                            </div>
+
+                            
+
+                            <div class="col-md-6 offset-md-4">
+                                <button type="submit" class="btn btn-primary">
+                                    Submit
+                                </button>
+                                
+                            </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+
+{% endblock %}

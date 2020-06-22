@@ -5,15 +5,30 @@
 
 {% block navbar_list %}
 
-  <li class="nav-item active ">
-	<a class="nav-link" href="{{ url_for('chat') }}">Chat</a>
-  </li>
-  <li class="nav-item">
-	<a class="nav-link" href="{{ url_for('calendar') }}">Calendar</a>
-  </li>
-  <li class="nav-item">
-	<a class="nav-link" href="{{ url_for('school_site') }}">School Site</a>
-  </li>
+  {% if not signed_in == None %}
+    <li class="nav-item active">
+    <a class="nav-link" href="{{ url_for('chat') }}">Chat</a>
+    </li>
+    <li class="nav-item ">
+    <a class="nav-link" href="{{ url_for('calendar') }}">Calendar</a>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('school_site') }}">School Site</a>
+    </li>
+   <li class="nav-item loggedin">
+      <a class="nav-link" href="#"> {{ navbar }} </a>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+    </li>
+  {% else %}
+    <li class="nav-item active pull-right float-right">
+      <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+    </li>
+    <li class="nav-item pull-right float-right">
+      <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+    </li>
+  {% endif %}
 
 {% endblock %}
 
@@ -44,15 +59,12 @@
                 <div class="chat_ib">
                   <h5>Selena Gomez is WitAI 
 					  <span class="chat_date">
-					  	{% if not messageHistory.peek() == None %}
-						  {{ messageHistory.peek().dayTime[1] }}
-						{% endif %}
+					  	
 					  </span>
 				  </h5>
 					<!-- last message 	 -->
-                  <p> {% if not messageHistory.peek() == None %}
-						  {{ messageHistory.peek().messagePair[1] }}
-						{% endif %} 
+              <p> 
+               
 				  </p>
                 </div>
               </div>
@@ -63,27 +75,28 @@
         </div>
         <div class="mesgs">
           <div class="msg_history">
-			  {% for message in messageHistory.stack %}
-			  
-			  	{% if message.messagePair[0] == witName %}
+        
+			  {% for message in messageHistory %}
+			  	{% if message[5] == witName %}
 			  		<div class="incoming_msg">
               			<div class="incoming_msg_img"> <img src="https://i.redd.it/6drhbjvpvvz41.jpg" alt="sunil">
 						</div>
 						<div class="received_msg">
 							<div class="received_withd_msg">
-							  <p> {{ message.messagePair[1] }} </p>
-							  <span class="time_date"> {{ message.dayTime[0] }}    |    {{ message.dayTime[1] }} </span>
+							  <p> {{ message[4] }} </p>
+							  <span class="time_date"> {{ message[1] }}    |    {{ message[2] }} </span>
 							</div>
 						</div>
             		</div>
 			    {% else %}
 			  		<div class="outgoing_msg">
 					  <div class="sent_msg">
-						<p> {{ message.messagePair[1] }}</p>
-						<span class="time_date"> {{ message.dayTime[0] }}    |    {{ message.dayTime[1] }} </span> 
+						<p> {{ message[4] }}</p>
+						<span class="time_date"> {{ message[1] }}    |    {{ message[2] }} </span> 
 					  </div>
             		</div>
-			  {% endif %}
+			   {% endif %}
+         
 			{% endfor %}
 
           </div>

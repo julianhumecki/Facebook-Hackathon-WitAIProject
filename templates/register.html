@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+{% block stylesheet %}
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='forms.css') }}">
+{% endblock%}
+
+{% block navbar_list %}
+
+	{% if not signed_in == None %}
+	  <li class="nav-item">
+		<a class="nav-link" href="{{ url_for('chat') }}">Chat</a>
+	  </li>
+	  <li class="nav-item ">
+		<a class="nav-link" href="{{ url_for('calendar') }}">Calendar</a>
+	  </li>
+	  <li class="nav-item">
+		<a class="nav-link" href="{{ url_for('school_site') }}">School Site</a>
+	  </li>
+	  <li class="nav-item loggedin">
+	  	<a class="nav-link" href="#"> {{ navbar }} </a>
+	  </li>
+	  <li class="nav-item">
+		<a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+	  </li>
+	{% else %}
+	  <li class="nav-item  pull-right float-right">
+	    <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+	  </li>
+	  <li class="nav-item active pull-right float-right">
+	    <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+	  </li>
+	{% endif %}
+
+{% endblock %}
+
+
+
+
+{% block body%}
+<div class="row justify-content-center">
+<div class="col-md-6">
+<div class="card">
+<header class="card-header">
+	<!-- <a href="" class="float-right btn btn-outline-primary mt-1">Log in</a> -->
+	<h4 class="card-title text-center mt-2">Sign up: <strong style="color:green;">{{register}}</strong></h4>
+</header>
+<article class="card-body">
+<form action="{{ url_for('register') }}" method="post">
+	<div class="form-row">
+		<div class="col form-group">
+			<label for="firstName">First name </label>   
+		  	<input type="text" required="required" class="form-control" name="firstName" placeholder="John">
+		</div> <!-- form-group end.// -->
+		<div class="col form-group">
+			<label for="lastName" >Last name</label>
+		  	<input type="text" class="form-control" required="required" name="lastName" placeholder="Smith">
+		</div> <!-- form-group end.// -->
+	</div> <!-- form-row end.// -->
+	<div class="form-group">
+		<label for="email">Email address</label>
+		<input type="email" name="email" class="form-control" required="required" placeholder="john.smith@gmail.com">
+		<small class="form-text text-muted">We'll never share your email with anyone else.</small>
+	</div> <!-- form-group end.// -->
+	<div class="form-group">
+		<label for="password" >Create password</label>
+	    <input class="form-control" required="required" name="password" type="password">
+	</div> <!-- form-group end.// -->  
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary btn-block"> Register  </button>
+    </div> <!-- form-group// -->      
+                                           
+</form>
+</article> <!-- card-body end .// -->
+<div class="border-top card-body text-center">Have an account? <a href="{{ url_for('login') }}">Log In</a></div>
+</div> <!-- card.// -->
+</div>
+</div>
+{% endblock %}
