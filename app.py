@@ -369,3 +369,7 @@ def inspiration():
 def neutral():
     neutral = ["Life is good, take a moment to appreciate it", "Dont dwell on the negative!", "Youre a Legend BE HAPPY!", "Take time to relax and enjoy yourself", "You're beautiful", "Life's too short to be neutral :)", ":) SMILE :)"]
     return random.choice(neutral)
+
+#if this app is run
+if __name__ == "__main__":
+    app.run()
