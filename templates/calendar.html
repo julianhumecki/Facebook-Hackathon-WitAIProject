@@ -12,9 +12,6 @@
     <li class="nav-item active ">
     <a class="nav-link" href="{{ url_for('calendar') }}">Calendar</a>
     </li>
-    <li class="nav-item">
-    <a class="nav-link" href="{{ url_for('school_site') }}">School Site</a>
-    </li>
     <li class="nav-item loggedin">
       <a class="nav-link" href="#"> {{ navbar }} </a>
     </li>
@@ -53,32 +50,32 @@
                 <div class="panel-body">
 
                     <ul class="media-list">
-                      {% for task in allTasks.taskList %}
+                      {% for task in taskList %}
                         <li class="media">
                             <div class="media-left">
                                 <div class="panel panel-primary text-center date">
                                     <div class="panel-heading month">
                                         <span class="panel-title strong hide-overflow">
                                             <!-- month -->
-                                            {{ task.dueDate[0] }}
+                                            {{ task[1] }}
                                         </span>
                                     </div>
                                     <div class="panel-body day text-danger hide-overflow">
-                                        {{ task.dueDate[1] }}
+                                        {{ task[1] }}
                                     </div>
                                 </div>
                             </div>
                             <div class="media-body">
                                 <h4 class="media-heading">
-                                   <strong> {{task.taskName }}</strong>
+                                   <strong> {{task[0] }}</strong>
                                    @
-                                   <strong> {{task.timeDue }} </strong>
+                                   <strong> {{task[3] }} </strong>
                                    in 
-                                   <strong> {{ task.location }}</strong>
+                                   <strong> {{ task[4] }}</strong>
                                 </h4>
                                 
                                 <p>
-                                    {{task.description}}
+                                    {{task[2]}}
                                 </p>
                             </div>
                         </li>

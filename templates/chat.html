@@ -12,9 +12,6 @@
     <li class="nav-item ">
     <a class="nav-link" href="{{ url_for('calendar') }}">Calendar</a>
     </li>
-    <li class="nav-item">
-    <a class="nav-link" href="{{ url_for('school_site') }}">School Site</a>
-    </li>
    <li class="nav-item loggedin">
       <a class="nav-link" href="#"> {{ navbar }} </a>
     </li>
@@ -43,13 +40,7 @@
             <div class="recent_heading">
               <h4>Messages</h4>
             </div>
-            <div class="srch_bar">
-              <div class="stylish-input-group">
-                <input type="text" class="search-bar"  placeholder="Search" >
-                <span class="input-group-addon">
-                <button type="button"> <i class="fa fa-search" aria-hidden="true"></i> </button>
-                </span> </div>
-            </div>
+            
           </div>
           <div class="inbox_chat">
 			  
@@ -82,17 +73,31 @@
               			<div class="incoming_msg_img"> <img src="https://i.redd.it/6drhbjvpvvz41.jpg" alt="sunil">
 						</div>
 						<div class="received_msg">
-							<div class="received_withd_msg">
-							  <p> <a href="{{message[4] }}">{{ message[4] }}</a> </p>
-							  <span class="time_date"> {{ message[1] }}    |    {{ message[2] }} </span>
+							<div class="received_withd_msg hide-overflow">
+                <!-- loop over all links send that -->
+                {% if message[6] %}
+                <p>
+                  {% for elem in message[4] %}
+  							     <a href="{{ elem }}" target="_blank">Might be helpful: {{ elem }} </a> 
+                      <br>
+                  {% endfor %}
+                  </p>
+  							  
+                {% else %}
+                  <p>
+                    {{ message[4][0] }}
+                  </p>
+                {% endif %}
+
+                <span class="time_date"> {{ message[3] }} | {{ message[1] }} {{ message[0] }} {{ message[2] }} </span>
 							</div>
 						</div>
             		</div>
 			    {% else %}
 			  		<div class="outgoing_msg">
 					  <div class="sent_msg">
-						<p> {{ message[4] }}</p>
-						<span class="time_date"> {{ message[1] }}    |    {{ message[2] }} </span> 
+						<p> {{ message[4][0] }}</p>
+						<span class="time_date"> {{ message[3] }} | {{ message[1] }} {{ message[0] }} {{ message[2] }}  </span> 
 					  </div>
             		</div>
 			   {% endif %}

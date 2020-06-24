@@ -12,6 +12,8 @@ from Scraping.scraping import *
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
+from calendar import weekday
+import random
 
 app = Flask(__name__)
 
@@ -35,23 +37,40 @@ def index():
     #already logged in shouldnt have access to log in form
     if not isLoggedIn():
         return redirect("/login", code=302)
-
-    if session.get("username") == None:
+    #check if empty
+    if session.get("username") == None or session.get("tasklist") == None:
         config_sessions()
-    #if request.method == "POST":
+
+    if request.method == "POST":
     #deal with new task
-        # taskName = request.form.get("task-name") 
-        # dueDate = request.form.get("dueDate")
-        # description = request.form.get("quick-describe")
-        # timeDue = request.form.get("timeDue") 
-        # location = request.form.get("location")
-        # dueDateList = str(dueDate).split("-")
-        # dueDate = (numericMonthToName[int(dueDateList[1])], int(dueDateList[2]))
+        taskName = str(request.form.get("task-name")) 
+        dueDate = str(request.form.get("dueDate"))
+        description = str(request.form.get("quick-describe"))
+        timeDue = str(request.form.get("timeDue")) 
+        location = str(request.form.get("location"))
+        #add task to database
+        taskAdded = db.execute("INSERT INTO tasks (taskname, duedate, description, timedue, location) VALUES (:taskname, :duedate, :description, :timedue, :location)",
+                {"taskname":taskName, "duedate": dueDate, "description":description, "timedue":timeDue, "location":location})
+        #save the addition
+        db.commit()
+        #select task list from user
+        tasksLinkingToTable = db.execute("SELECT tasklist FROM users WHERE email = :email", {"email":session["username"]}).fetchone()[0]
+        length = 0
+        if not tasksLinkingToTable is None:
+            length = len(tasksLinkingToTable)
+
+        task_list = db.execute("SELECT id FROM tasks WHERE taskname = :taskname AND duedate = :duedate AND description = :description AND timedue = :timedue AND location = :location ", {"taskname":taskName, "duedate": dueDate, "description":description, "timedue":timeDue, "location":location}).fetchone()
+        #extract the id
+        task_list_id = int(task_list[0])
+        length += 1
+        #add to list in users
+        db.execute("UPDATE users SET tasklist[:index] = :task_list_id WHERE email = :email",{"index":length, "task_list_id":task_list_id, "email":session["username"]})
+        #save the changes
+        db.commit()
+        fillTaskList()
+
         
-        # # input("Heyyy ")
-        # #add to our list of tasks
-        # allTasks.addToList(Task(taskName, description, timeDue, location, dueDate))
-        #print(len(allTasks.taskList))
+        
     return render_template("message.html", signed_in=session["username"], navbar=session["welcome_message"])
 
 
@@ -79,14 +98,11 @@ def chat():
         
         #get computer query
         witResponse = wc.message(userQuery)
-        answer = ['', 'stupid']
-
-        try: 
-            answer = extract(witResponse)        
-        except:
-            pass
 
         currentDayAndTime = datetime.now(tz)
+        #Get info
+        witAI_info = extract(witResponse)
+        
 
         time = str(currentDayAndTime.hour) + ":" + str(currentDayAndTime.minute)
         day = currentDayAndTime.day
@@ -94,20 +110,25 @@ def chat():
         year = currentDayAndTime.year
         sender = "User"
 
-        witResponse = getSearchResults(userQuery)
-        #print(witResponse)
-        witRepo = str()
-        #for url in witResponse:
-        #    witRepo += url + "\n"
-        witResponse = witResponse[0]
-        #print(witResponse)
-        
+        #gets top 5 links if uncertain
+        if(witAI_info[2] < 0.70 or witAI_info[1] == ""):
+            witResponse = getSearchResults(userQuery)
+            linkInContent = True
+        else:
+            if(witAI_info[0] == "show_schedule"):
+                return redirect("/calendar", code=302)
+            if(witAI_info[1] == "state:very_negative" or witAI_info[1] == "state:negative" or witAI_info[1] == "state:neutral" or witAI_info[1] == "state:positive" or witAI_info[1] == "state:very_positive"):
+                witResponse = extractRelevantInfo(witAI_info)
+                linkInContent = False
+            else:
+                witResponse = getSearchResults(userQuery)
+                linkInContent = True
         
         #insert into the database
-        userAdded = db.execute("INSERT INTO messagings (day, month, year, timesent, messagecontent, sender) VALUES (:day, :month, :year, :timesent, :messagecontent, :sender)",
-                {"day":day, "month": month, "year":year, "timesent":time, "messagecontent":userQuery, "sender":sender})
-        witAdded = db.execute("INSERT INTO messagings (day, month, year, timesent, messagecontent, sender) VALUES (:day, :month, :year, :timesent, :messagecontent, :sender)",
-                {"day":day, "month": month, "year": year, "timesent":time, "messagecontent":str(witResponse), "sender":witName})
+        userAdded = db.execute("INSERT INTO messagings (day, month, year, timesent, messagecontent, sender, haslinkincontent) VALUES (:day, :month, :year, :timesent, :messagecontent, :sender, :haslinkincontent)",
+                {"day":day, "month": month, "year":year, "timesent":time, "messagecontent":[userQuery], "sender":sender, "haslinkincontent":False})
+        witAdded = db.execute("INSERT INTO messagings (day, month, year, timesent, messagecontent, sender, haslinkincontent) VALUES (:day, :month, :year, :timesent, :messagecontent, :sender, :haslinkincontent)",
+                {"day":day, "month": month, "year": year, "timesent":time, "messagecontent":witResponse, "sender":witName, "haslinkincontent":linkInContent})
         db.commit()
     
         messagesLinkingToTable = db.execute("SELECT messagehistory FROM users WHERE email = :email", {"email":session["username"]}).fetchone()[0]
@@ -118,8 +139,9 @@ def chat():
 
         #messages = db.execute("SELECT messagehistory FROM users WHERE email = :email", {"email":session["username"]}).fetchone();
         #update entries in message history
-        message_one_id = db.execute("SELECT id FROM messagings WHERE day = :day AND month = :month AND year = :year AND messagecontent = :messagecontent", {"day":day, "month":month, "year":year, "messagecontent":userQuery}).fetchone()
-        message_two_id = db.execute("SELECT id FROM messagings WHERE day = :day AND month = :month AND year = :year AND messagecontent = :messagecontent", {"day":day, "month":month, "year":year, "messagecontent":str(witResponse)}).fetchone()
+        message_one_id = db.execute("SELECT id FROM messagings WHERE day = :day AND month = :month AND year = :year AND timesent = :timesent AND sender = :sender", {"day":day, "month":month, "year":year, "timesent":time, "sender":sender}).fetchone()
+        message_two_id = db.execute("SELECT id FROM messagings WHERE day = :day AND month = :month AND year = :year AND timesent = :timesent AND sender = :sender", {"day":day, "month":month, "year":year, "timesent":time, "sender":witName}).fetchone()
+        #grab first id
         message_one_id = int(message_one_id[0])
         message_two_id = int(message_two_id[0])
         length += 1
@@ -141,19 +163,10 @@ def calendar():
     if not isLoggedIn():
         return redirect("/login", code=302)
 
-    if session.get("username") == None:
+    if session.get("username") == None or session.get("tasklist") == None:
         config_sessions()
-    return render_template("calendar.html", allTasks=allTasks, signed_in=session["username"], navbar=session["welcome_message"])
+    return render_template("calendar.html", allTasks=allTasks, signed_in=session["username"], navbar=session["welcome_message"], taskList=session["tasklist"])
 
-@app.route("/schoolsite")
-def school_site():
-    #already logged in shouldnt have access to log in form
-    if not isLoggedIn():
-        return redirect("/login", code=302)
-
-    if session.get("username") == None:
-        config_sessions()
-    return render_template("schoolSite.html", signed_in=session["username"], navbar=session["welcome_message"])
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -176,6 +189,7 @@ def login():
             session["firstname"] = result.firstname
             session["welcome_message"] = "Signed in as: " + session["firstname"] 
             fillMessageHistory()
+            fillTaskList()
             return redirect("/", code=302)
 
     return render_template("login.html", signed_in=session["username"], navbar=session["welcome_message"])
@@ -223,9 +237,27 @@ def logout():
 def extract(json):
 
     ent = json['entities']   
-    role = ent['day:day'][0]['role']
-    day =  ent['day:day'][0]['value']
-    return [role, day]
+    role = str()
+    important = str()
+    confidence = 0
+    if (len(json['intents']) > 0):
+        role = json['intents'][0]['name']
+        important = str()
+        confidence = json['intents'][0]['confidence']
+        
+        length = 0
+        for feeling in ent:
+            length +=1
+        if(length > 0):
+            if role == "show_schedule":
+                important =  ent['day:day'][0]['value']
+            elif role == "feeling":
+                for feeling in ent:
+                    important = feeling
+                    break
+
+    
+    return [role, important, confidence]
 
 
 def config_sessions():
@@ -233,21 +265,23 @@ def config_sessions():
     session["firstname"] = None
     session["welcome_message"] = None
     session["messaginghistory"] = []
+    session["tasklist"] = []
 
 def isLoggedIn():
     if session.get("username") is None:
         return False
     return True
+
 def fillMessageHistory():
 #loop over all message ids
     messageList = list()
     allMessages = db.execute("SELECT messagehistory FROM users WHERE email = :email", {"email":session["username"]}).fetchone()[0]
-    #print(allMessages)
-    for message_id in allMessages:
-        #get message contents from messages sent
-        value = db.execute("SELECT day,month,year,timesent, messagecontent,sender FROM messagings WHERE id = :id", {"id":message_id}).fetchone()
-        #print(value)
-        messageList.append((value.day, value.month, value.year, value.timesent, value.messagecontent, value.sender))
+    if not allMessages is None:
+        for message_id in allMessages:
+            #get message contents from messages sent
+            value = db.execute("SELECT day,month,year,timesent, messagecontent,sender,haslinkincontent FROM messagings WHERE id = :id", {"id":message_id}).fetchone()
+            
+            messageList.append((value.day, value.month, value.year, value.timesent, value.messagecontent, value.sender, value.haslinkincontent))
     #phrase = 'I am not sure what\'s going on ' + answer[1]
     #messageHistory.push(MessagePair(witName, phrase, dayTime))
     #witResponse = getWitResponse()
@@ -255,3 +289,83 @@ def fillMessageHistory():
     #------------------------------------------------------------------
     session["messaginghistory"] = messageList.copy()
     return
+
+def fillTaskList():
+    tasks = list()
+    allTasks = db.execute("SELECT tasklist FROM users WHERE email = :email", {"email":session["username"]}).fetchone()[0]
+    if not allTasks is None:
+        for task_id in allTasks:
+            value = db.execute("SELECT taskname, duedate, description, timedue, location FROM tasks WHERE id = :id", {"id":task_id}).fetchone()
+            insertion = (value.taskname, value.duedate, value.description, value.timedue, value.location)
+            insertToTasks(tasks, insertion)
+    
+    session["tasklist"] = tasks.copy()
+    return
+
+#insert in a chronological way
+def insertToTasks(tasks, insertion):
+    #sorting by the 2nd index of description
+    if len(tasks) == 0:
+        tasks.append(insertion)
+        return
+    count = 0
+    taskCopy = tasks.copy()
+    for task in taskCopy:
+        if (insertion[1] < task[1]):
+            tasks.insert(count, insertion)
+            return
+        #if same day, check which time is earlier
+        elif (insertion[1] == task[1]):
+            if(insertion[3] < task[3]):
+                tasks.insert(count, insertion)
+                return
+            else:
+                while(insertion[3] >= task[3] and insertion[1]== task[1]):
+                    count += 1    
+                    if(count < len(tasks)):
+                        task = tasks[count]
+                    else:
+                        
+                        tasks.append(insertion)
+                        return
+                tasks.insert(count, insertion)
+
+            return
+        #last element check
+        elif (count == (len(tasks) - 1) and insertion[1] > task[1]):
+            tasks.append(insertion)
+            return
+        #last elem, same day
+        elif (count == (len(tasks) - 1) and insertion[1] == task[1]):
+            if(insertion[3] < task[3]):
+                tasks.insert(count, insertion)
+                return
+            else:
+                tasks.append(insertion)
+
+        count +=1
+    return 
+
+def extractRelevantInfo(witAI_info):
+    if witAI_info == "show_schedule":
+        return []
+    else:
+        return [getAppropriateResponse(witAI_info[1].split(":")[1])]
+
+def getAppropriateResponse(feeling):
+    if feeling == "positive" or feeling == "very_positive":
+        return postiveResponse()
+    elif feeling == "negative" or feeling == "very_negative":
+        return inspiration()
+    else:
+        return neutral()
+
+def postiveResponse():
+    positive = ["Wowwwww", "That's dope", "Legend", "Killing the game", "Atta legend", "Keep at it", "You're golden", "That's how it be when you're awesome"]
+    return random.choice(positive)
+def inspiration():
+    inspiration = ["You can do it", "Dont give up, you're very strong", "Keep pushing!", "You will get through this!", "You will succeed!", "Trust yourself!", "You're amazing! Remember this!", "Keep trying!"]
+    return random.choice(inspiration)
+def neutral():
+    neutral = ["Life is good, take a moment to appreciate it", "Dont dwell on the negative!", "Youre a Legend BE HAPPY!", "Take time to relax and enjoy yourself", "You're beautiful", "Life's too short to be neutral :)", ":) SMILE :)"]
+    return random.choice(neutral)

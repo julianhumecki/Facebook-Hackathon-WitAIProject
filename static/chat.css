@@ -8,6 +8,9 @@
 .message-box{
 	height: 90vh;
 }
+.hide-overflow{
+  overflow: hidden;
+}
 
 .container{max-width:1170px; margin:auto;}
 img{ max-width:100%;}
