@@ -7,6 +7,17 @@ A bot for helping students manage their workload and relieve their stress.
 1. Flask (pip install flask)
 2. Wit (pip install wit)
 
+<b><h2> Login/Registering </h2></b>
+To make use of our services, you need to have registered/signed up for an account.
+
+<b><h2> Student Care </h2></b>
+Here you will have access to a form that adds events to your calendar (/calendar)
+Once you submit it, it will add this event to your calendar. These added events are sorted based on date.
+
+<b><h2> Chat </h2></b>
+This is the main part of our app. Here you can type in any query, and you will receive a response. 
+This will either be in the form of<span><b>5</b> </span>links or in the form of a text response. If you ask to see your schedule on a given day, our chat will interpret this and move you to the appropriate section (/calendar).
+Our chat will also detect when you are feeling a certain way, and will respond appropriately
 
 <b><h2>Utterances</h2></b>
 
