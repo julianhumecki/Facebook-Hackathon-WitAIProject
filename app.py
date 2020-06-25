@@ -104,7 +104,7 @@ def chat():
         witAI_info = extract(witResponse)
         
 
-        time = str(currentDayAndTime.hour) + ":" + str(currentDayAndTime.minute)
+        time = str(currentDayAndTime.hour) + ":" + str(currentDayAndTime.minute) + ":" + str(currentDayAndTime.second)
         day = currentDayAndTime.day
         month = numericMonthToName[currentDayAndTime.month]
         year = currentDayAndTime.year
@@ -112,6 +112,7 @@ def chat():
 
         #gets top 5 links if uncertain
         if(witAI_info[2] < 0.70 or witAI_info[1] == ""):
+            print("results")
             witResponse = getSearchResults(userQuery)
             linkInContent = True
         else:
@@ -124,6 +125,8 @@ def chat():
                 witResponse = getSearchResults(userQuery)
                 linkInContent = True
         
+        print(witResponse)
+        input("wait...")
         #insert into the database
         userAdded = db.execute("INSERT INTO messagings (day, month, year, timesent, messagecontent, sender, haslinkincontent) VALUES (:day, :month, :year, :timesent, :messagecontent, :sender, :haslinkincontent)",
                 {"day":day, "month": month, "year":year, "timesent":time, "messagecontent":[userQuery], "sender":sender, "haslinkincontent":False})
@@ -139,8 +142,8 @@ def chat():
 
         #messages = db.execute("SELECT messagehistory FROM users WHERE email = :email", {"email":session["username"]}).fetchone();
         #update entries in message history
-        message_one_id = db.execute("SELECT id FROM messagings WHERE day = :day AND month = :month AND year = :year AND timesent = :timesent AND sender = :sender", {"day":day, "month":month, "year":year, "timesent":time, "sender":sender}).fetchone()
-        message_two_id = db.execute("SELECT id FROM messagings WHERE day = :day AND month = :month AND year = :year AND timesent = :timesent AND sender = :sender", {"day":day, "month":month, "year":year, "timesent":time, "sender":witName}).fetchone()
+        message_one_id = db.execute("SELECT id FROM messagings WHERE day = :day AND month = :month AND year = :year AND timesent = :timesent AND sender = :sender ", {"day":day, "month":month, "year":year, "timesent":time, "sender":sender}).fetchone()
+        message_two_id = db.execute("SELECT id FROM messagings WHERE day = :day AND month = :month AND year = :year AND timesent = :timesent AND sender = :sender ", {"day":day, "month":month, "year":year, "timesent":time, "sender":witName}).fetchone()
         #grab first id
         message_one_id = int(message_one_id[0])
         message_two_id = int(message_two_id[0])
