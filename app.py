@@ -112,7 +112,7 @@ def chat():
 
         #gets top 5 links if uncertain
         if(witAI_info[2] < 0.70 or witAI_info[1] == ""):
-            print("results")
+            
             witResponse = getSearchResults(userQuery)
             linkInContent = True
         else:
@@ -125,8 +125,7 @@ def chat():
                 witResponse = getSearchResults(userQuery)
                 linkInContent = True
         
-        print(witResponse)
-        input("wait...")
+        
         #insert into the database
         userAdded = db.execute("INSERT INTO messagings (day, month, year, timesent, messagecontent, sender, haslinkincontent) VALUES (:day, :month, :year, :timesent, :messagecontent, :sender, :haslinkincontent)",
                 {"day":day, "month": month, "year":year, "timesent":time, "messagecontent":[userQuery], "sender":sender, "haslinkincontent":False})
