@@ -1,6 +1,5 @@
-![bruh](https://wusa.ca/sites/ca.waterloo-undergraduate-student-association/files/uploads/images/logo-studentcare.png)
 <h1><b>StudentCare</b></h1>
-A bot for helping students manage their workload and relieve their stress.
+An NLP bot for helping students manage their workload and relieve their stress.
 
 <b><h2>Dependencies</h2></b>
 
